@@ -18,7 +18,7 @@ const clientSchema = new mongoose.Schema(
       type: String,
     },
     salesRep: {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
   },
