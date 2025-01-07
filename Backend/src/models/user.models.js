@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import { userRole } from "../global";
+import { userRole } from "../global/index.js";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
       required: true,
     },
@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema(
     },
     address: {
       type: String,
-      required: true,
     },
     role: {
       type: String,
