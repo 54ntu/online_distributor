@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { envConfig } from "../config/config";
+import { envConfig } from "../config/config.js";
 
 const generateToken = (userid, role) => {
   const token = jwt.sign({ userid, role }, envConfig.jwtsecretkey, {

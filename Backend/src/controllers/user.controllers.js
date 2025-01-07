@@ -1,22 +1,28 @@
 import { isValidObjectId } from "mongoose";
 import User from "../models/user.models.js";
-import ApiError from "../services/ApiError.js";
 import APiResponse from "../services/Apiresponse.js";
 import hashPassword, { comparedPassword } from "../services/authController.js";
 import generateToken from "../services/generateToken.js";
 
 class UserController {
   async userRegister(req, res) {
+    // console.log("register page is hitted");
+    // console.log(`req  i am getting is ${req.body}`);
     const { username, email, password, phone_no, address, role } = req.body;
+    console.log(req.body);
     if (!username || !email || !password || !phone_no || !address || !role) {
-      throw new ApiError(400, "all fields are required..!!");
+      return res.status(400).json({
+        message: "all fields are required!!",
+      });
     }
 
     const isUserExist = await User.findOne({
       $or: [{ email }, { username }],
     });
     if (isUserExist) {
-      throw new ApiError(400, "user already exist");
+      return res.status(400).json({
+        message: "user already exist",
+      });
     }
 
     const encryptPassword = await hashPassword(password);
@@ -31,7 +37,9 @@ class UserController {
 
     const isuserCreated = await User.findById(userdata._id).select("-password");
     if (!isuserCreated) {
-      throw new ApiError(500, "sales representatie creation failed!!");
+      return res.status(500).json({
+        message: "sales rep creation failed.!!",
+      });
     }
 
     return res
@@ -46,18 +54,21 @@ class UserController {
   }
 
   async loginUser(req, res) {
+    console.log("login page is hitted");
     try {
-      const { username, email, password } = req.body;
-      if (!username || !email || !password) {
-        throw new ApiError(400, "username or email ,password requires..!!!");
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({
+          message: "email or password required..!!",
+        });
       }
 
-      const userExist = await User.findOne({
-        $or: [{ email }, { username }],
-      });
+      const userExist = await User.findOne({ email });
 
       if (!userExist) {
-        throw new ApiError(404, "usernmae or email does not exist!!");
+        return res.status(404).json({
+          message: "email does not exist!!",
+        });
       }
 
       const isPasswordMatched = await comparedPassword(
@@ -66,25 +77,27 @@ class UserController {
       );
 
       if (!isPasswordMatched) {
-        throw new ApiError(401, "password doesnot matched!!");
+        return res.status(401).json({
+          message: "password doesnot matched!!",
+        });
       }
 
-      const token = generateToken(userExist._id, userExist.role);
+      const token = await generateToken(userExist._id, userExist.role);
 
       return res
         .status(200)
         .json(new APiResponse(200, token, "logged in successfully!😊😊😊"));
     } catch (error) {
-      throw new ApiError(500, "error while logged in");
+      return res.status(500).json({
+        message: "error while log in",
+      });
     }
   }
-
-  
 
   async getSalesRep(req, res) {
     const salesrep = await User.find().select("-password");
     if (salesrep.length === 0) {
-      throw new ApiError(404, "salesrep data not foud!!!");
+      return res.status(404).json("salesrep data not found");
     }
     return res
       .status(200)
@@ -101,8 +114,18 @@ class UserController {
     try {
       const { id } = req.params;
       if (!isValidObjectId(id)) {
-        throw new ApiError(400, "invali objectid");
+        return res.status(400).json({
+          message: "invalid object id",
+        });
       }
+
+      const data = await User.findById(id);
+      if (!data) {
+        return res.status(404).json({
+          message: "data not available",
+        });
+      }
+
       await User.findByIdAndDelete(id);
       return res
         .status(200)
@@ -113,7 +136,9 @@ class UserController {
           )
         );
     } catch (error) {
-      throw new ApiError(400, "error while deleting sales repres data");
+      return res.status(500).json({
+        message: "error while deleting sales repres data",
+      });
     }
   }
 }
