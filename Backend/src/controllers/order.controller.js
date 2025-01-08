@@ -3,8 +3,11 @@ import Product from "../models/product.models.js";
 import Order from "../models/order.models.js";
 import ApiResponse from "../services/Apiresponse.js";
 import { isValidObjectId } from "mongoose";
+import sendMail from "../services/sendmail.js";
+import { envConfig } from "../config/config.js";
 class OrderController {
   static async createOrder(req, res) {
+    const email = envConfig.admin_email;
     const salesRep = req.user;
     const salesRepId = salesRep.userid;
     const { client, products } = req.body;
@@ -68,9 +71,11 @@ class OrderController {
       await product.save();
       //check if threshold meet or not
       if (product.restockThreshold <= product.stock) {
-        console.log(
-          `product id ${productId} has reached its restockingthreshold `
-        );
+        await sendMail({
+          to: email,
+          subject: "restocking alert",
+          text: `product id ${productId} has reached its restockingthreshold `,
+        });
       }
       return res
         .status(201)
