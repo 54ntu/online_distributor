@@ -167,6 +167,18 @@ class OrderController {
       //lookup for the products data
     ]);
 
+    if (orders.length === 0) {
+      return res.status(404).json({
+        message: "order data not found....",
+      });
+    }
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, orders, "order data fetched successfully...!!")
+      );
+
     console.log(orders);
   }
 }
