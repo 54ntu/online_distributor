@@ -9,6 +9,24 @@ router
     UserMiddleware.isUserLoggedIn,
     UserMiddleware.isAdmin,
     ProductController.addProduct
+  )
+  .get(
+    UserMiddleware.isUserLoggedIn,
+    UserMiddleware.isAdmin,
+    ProductController.getProductDetails
+  );
+
+router
+  .route("/:id")
+  .patch(
+    UserMiddleware.isUserLoggedIn,
+    UserMiddleware.isAdmin,
+    ProductController.updateProduct
+  )
+  .delete(
+    UserMiddleware.isUserLoggedIn,
+    UserMiddleware.isAdmin,
+    ProductController.deleteProduct
   );
 
 export default router;
