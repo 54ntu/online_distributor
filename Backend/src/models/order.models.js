@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { orderStatus } from "../global";
+import { orderStatus } from "../global/index.js";
 
 const orderSchema = new mongoose.Schema(
   {
@@ -40,5 +40,5 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Order = mongoose.Schema("Order", orderSchema);
+const Order = mongoose.model("Order", orderSchema);
 export default Order;
